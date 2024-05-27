@@ -1,3 +1,32 @@
+/**
+ *  CH32VX USB Serial Library
+ *
+ *  Copyright (c) 2024 Florian Korotschenko aka KingKoro
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ *
+ *
+ *  file         : ch32v_usb_serial.h
+ *  description  : usb serial library main header
+ *
+ */
+
 #ifndef __CH32V_USB_SERIAL_H
 #define __CH32V_USB_SERIAL_H
 
@@ -55,13 +84,12 @@ extern "C" {
 #define USB_CDC_STOPBIT     0                   /* Select USB Port Stopbit here */
 #define USB_CDC_PARITY      0                   /* Select USB Port Paritybit here */
 #define USB_TX_MODE         USB_TX_ASYNC        /* Select USB Port Send Mode here */
-#define USB_RX_OVERFLOW     USB_RX_HALT         /* Select USB Port Receive Overflow Mode here */
-#define USB_SCANF_MAX_STR   512                 /* Select USB Scanf (Extended Lib) max length of parsed string */        
+#define USB_RX_OVERFLOW     USB_RX_HALT         /* Select USB Port Receive Overflow Mode here */   
 #define GETCH_CLI_FEEDBACK                      /* Wether to display feedback into console when typing in */
 #define TMP_FBUF_SIZE       128                 /* Buffer size to temporary store float strings after conversion in ftoa_s() */
 #define TMP_FSTR_SIZE       16                  /* Length of individial strings of floats (num of floats stored at once = TMP_FBUF_SIZE / TMP_FSTR_SIZE) */
 #define TMP_FSTR_NUM        TMP_FBUF_SIZE / TMP_FSTR_SIZE   /* default is 8 slots for temporary float strings (automatically overwritten on overflow) */
-#define USB_SCANF_BUF_SIZE  512                 /* Maximum buffer to read from USB RX before scanf-matching */
+#define USB_SCANF_BUF_SIZE  512                 /* Maximum USB RX buffer size for scanf() before matching */
 
 
 /* ++++++++++++++++++++ USER CONFIG AREA END ++++++++++++++++++++ */
