@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "ch32v10x_usb.h": "c",
+        "ch32v_usb_serial.h": "c",
+        "ch32v10x_usbfs_device.h": "c",
+        "usb_desc.h": "c",
+        "usb_pwr.h": "c",
+        "hw_config.h": "c",
+        "usb_lib.h": "c",
+        "usb_regs.h": "c",
+        "ch32x035_usb.h": "c"
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "name": "ch32v-usb-serial",
+    "version": "0.0.1",
+    "build": {
+      "extraScript": "pio_set_ch32_platform.py"
+    }
+  }

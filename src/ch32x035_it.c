@@ -1,0 +1,76 @@
+/********************************** (C) COPYRIGHT *******************************
+ * File Name          : ch32v20x_it.c
+ * Author             : WCH
+ * Version            : V1.0.0
+ * Date               : 2021/06/06
+ * Description        : Main Interrupt Service Routines.
+*********************************************************************************
+* Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
+* Attention: This software (modified or not) and binary are used for 
+* microcontroller manufactured by Nanjing Qinheng Microelectronics.
+*******************************************************************************/
+#include "ch32x035_it.h"
+#include "ch32v_usb_serial.h"
+
+void NMI_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void HardFault_Handler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+void TIM3_IRQHandler( void )__attribute__((interrupt("WCH-Interrupt-fast")));
+
+/*********************************************************************
+ * @fn      NMI_Handler
+ *
+ * @brief   This function handles NMI exception.
+ *
+ * @return  none
+ */
+void NMI_Handler(void)
+{
+}
+
+/*********************************************************************
+ * @fn      TIM3_IRQHandler
+ *
+ * @brief   This function handles TIM3 exception.
+ *
+ * @return  none
+ */
+void TIM3_IRQHandler( void )
+{
+
+    if( TIM_GetITStatus( TIM3, TIM_IT_Update ) != RESET )
+    {
+        /* Clear interrupt flag */
+        TIM_ClearITPendingBit( TIM3, TIM_IT_Update );
+
+        /* uart timeout counts */
+        Uart.Rx_TimeOut++;
+        Uart.USB_Up_TimeOut++;
+        // If USB TX async mode: When USB Tx ready, send queued tx data via this ISR
+        #if(USB_TX_MODE == USB_TX_ASYNC)
+          if(!tx_semaphore)
+          {
+            USB_Tx_runner();
+          }
+          else
+          {
+            //printf("Skipping USB_Tx_runner() ...\r\n");
+          }
+        #endif
+    }
+
+}
+/*********************************************************************
+ * @fn      HardFault_Handler
+ *
+ * @brief   This function handles Hard Fault exception.
+ *
+ * @return  none
+ */
+void HardFault_Handler(void)
+{
+  while (1)
+  {
+  }
+}
+
+
