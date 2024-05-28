@@ -79,7 +79,7 @@ extern "C" {
 
 /* ++++++++++++++++++++ USER CONFIG AREA BEGIN ++++++++++++++++++++ */
 
-#define USB_CDCPORT         CDC_USBD            /* Select USB Port here (CDC_USBD or CDC_USBFS) */
+#define USB_CDCPORT         CDC_USBFS            /* Select USB Port here (CDC_USBD or CDC_USBFS) */
 #define USB_CDC_BAUDRATE    1000000              /* Select USB Port Baudrate here (For very high speeds >500KBaud/s, consider upping speed of timer TIM2 or any other interrupt, invoking USB_Tx_runner() ) */
 #define USB_CDC_STOPBIT     0                   /* Select USB Port Stopbit here */
 #define USB_CDC_PARITY      0                   /* Select USB Port Paritybit here */
@@ -177,7 +177,10 @@ extern "C" {
 #define DEF_UARTx_RX_BUF_LEN       ( 4 * 512 )                                  /* Serial x receive buffer size */
 #define DEF_UARTx_TX_BUF_LEN       ( 2 * 512 )                                  /* Serial x transmit buffer size */
 #if(USB_CDCPORT == CDC_USBFS)
-    #if defined(CH32X035) || defined(CH32X033) || defined(CH32V10X) || defined(CH32V30X)
+    #if defined(CH32X035) || defined(CH32X033) || defined(CH32V10X)
+        #define DEF_USB_FS_PACK_LEN        DEF_USBD_FS_PACK_SIZE                        /* USB full speed mode packet size for serial x data */
+        #define DEF_USB_HS_PACK_LEN        DEF_USBD_HS_PACK_SIZE                        /* USB high speed mode packet size for serial x data */
+    #elif defined(CH32V30X)
         #define DEF_USB_FS_PACK_LEN        DEF_USBD_FS_PACK_SIZE                        /* USB full speed mode packet size for serial x data */
         #define DEF_USB_HS_PACK_LEN        DEF_USBD_HS_PACK_SIZE                        /* USB high speed mode packet size for serial x data */
     #elif defined(CH32V20X)
