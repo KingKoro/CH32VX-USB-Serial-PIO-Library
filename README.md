@@ -11,14 +11,14 @@ You need to have PlatformIO VSCode Plugin with the [WCH CH32V](https://github.co
 ## Setup
 Simply clone this repository onto your computer and open the folder like a regular PlatformIO project. You can set the build target by choosing one from the ```platformio.ini``` file or adding your own one for the specific MCU model. Just take the predefined environments as an example.
 
-Alternativly, you can also copy the library ```lib/CH32V_USB_SERIAL``` into any PIO project, modify your ```platformio.ini```, add the required ```ch32xxxx_it``` code for the timer interrupt handlers and import the library into your ```main.c``` with: 
+Alternativly, you can also copy the library ```lib/CH32V_USB_SERIAL``` into any PIO project, modify your ```platformio.ini```, add the required ```ch32xxxx_it``` code for the timer interrupt handlers (recommended for async tx mode) and import the library into your ```main.c``` with: 
 ```c
 #include "ch32v_usb_serial.h"
 ```
 
 # Usage
 
-Import ```ch32v_usb_serial.h```, then modify the ```platform.ini``` environment by specifying the serial monitor speed, flow control, build source filters and build flags. The build flags are important and tell the compiler which family of MCUs is the build target. The provided ```platform.ini``` gives a good example.
+Import ```ch32v_usb_serial.h```, then modify the ```platform.ini``` environment by specifying the serial monitor speed, flow control, build source filters and build flags. The build flags are important and tell the compiler which family of MCUs is the build target. The provided ```platform.ini``` gives a good example. E.g. ```build_flags = -DHAL=CH32V20X``` for selecting the CH32V20x family.
 
 Afterwards, edit the user config section (line 82 to 92) in ```lib/CH32V_USB_SERIAL/ch32v_usb_serial.h``` to control the serial port settings. The following settings are available:
 
@@ -28,7 +28,7 @@ Afterwards, edit the user config section (line 82 to 92) in ```lib/CH32V_USB_SER
 | USB_CDC_BAUDRATE         | Set the baudrate. For very high speeds above 500kBaud/s, consider upping the timer speed in TX asynchronous mode. The maximum speed tested is 1MBaud/s.           |
 | USB_CDC_STOPBIT       | Select USB Port Stopbit. Default = 0 |
 | USB_CDC_PARITY     | Select USB Port Paritybit. Default = 0   |
-| USB_TX_MODE | Select USB TX send mode (either ```USB_TX_SYNC``` for synchronous or ```USB_TX_ASYNC```for asynchronous). In synchronous mode, printf() will wait for usb availability and return after data was sent. In asynchronous mode, printf() returns immediately, and only writes into a send buffer, which needs to be periodically read from and actually written into the usb port. This can be achieved by either calling ```USB_Tx_runner()``` in an endless while-loop or using a timer interrupt routine (default). Timer 2 is used for this purpose, except for CH32X03x, which uses Timer 3.    | 
+| USB_TX_MODE | Select USB TX send mode (either ```USB_TX_SYNC``` for synchronous or ```USB_TX_ASYNC```for asynchronous). In synchronous mode, printf() will wait for usb availability and return after data was sent. In asynchronous mode, printf() returns immediately, and only writes into a send buffer, which needs to be periodically read from and actually written into the usb port. This can be achieved by either calling ```USB_Tx_runner()``` in an endless while-loop or using a timer interrupt routine to call ```USB_Tx_runner()``` periodically (default). Timer 2 is used for this purpose, except for CH32X03x, which uses Timer 3.    | 
 | USB_RX_OVERFLOW           | Select USB Port receive overflow mode. Select either ```USB_RX_HALT``` (default) to stop accepting USB traffic if the receive buffer is almost full and not being processed fast enough, or ```USB_RX_OVERWRITE``` to ignore overflow and overwrite older data.    |
 | GETCH_CLI_FEEDBACK         | Wether to display feedback into console when typing into. Comment out if not desired. Default = on                |
 | TMP_FBUF_SIZE         | Buffer size to temporary store float strings after conversion in ftoa_s(). Default = 128 Bytes |
