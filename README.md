@@ -25,7 +25,7 @@ Afterwards, edit the user config section (line 82 to 92) in ```lib/CH32V_USB_SER
 |       Option:       | Description:                                                           |
 |:-----------------:|-----------------------------------------------------------------|
 | USB_CDCPORT           | For MCUs with multiple USB-ports select which one to use (```CDC_USBD``` or ```CDC_USBFS```). For CH32V30x, USBD means USB-HS. For CH32X03x and CH32V10x, only USBFS is a valid option.       |
-| USB_CDC_BAUDRATE         | Set the baudrate. For very high speeds above 500kBaud/s, consider upping the timer speed in TX asynchronous mode. The maximum speed tested is 1MBaud/s.           |
+| USB_CDC_BAUDRATE         | Set the baudrate. For very high speeds above 500kBaud/s, consider upping the timer speed in TX asynchronous mode. The maximum speed tested is 1MBaud/s. Default = 1000000           |
 | USB_CDC_STOPBIT       | Select USB Port Stopbit. Default = 0 |
 | USB_CDC_PARITY     | Select USB Port Paritybit. Default = 0   |
 | USB_TX_MODE | Select USB TX send mode (either ```USB_TX_SYNC``` for synchronous or ```USB_TX_ASYNC```for asynchronous). In synchronous mode, printf() will wait for usb availability and return after data was sent. In asynchronous mode, printf() returns immediately, and only writes into a send buffer, which needs to be periodically read from and actually written into the usb port. This can be achieved by either calling ```USB_Tx_runner()``` in an endless while-loop or using a timer interrupt routine to call ```USB_Tx_runner()``` periodically (default). Timer 2 is used for this purpose, except for CH32X03x, which uses Timer 3.    | 
