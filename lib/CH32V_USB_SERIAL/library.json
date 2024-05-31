@@ -1,7 +1,24 @@
 {
     "name": "ch32v-usb-serial",
-    "version": "0.0.1",
+    "version": "0.1.0",
+    "description": "A library for utilizing a USB Serial port (COM-Port) on CH32V/X MCUs.",
+    "keywords": "ch32v, serial, usb, printf, scanf",
     "build": {
       "extraScript": "pio_set_ch32_platform.py"
-    }
+    },
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/KingKoro/CH32VX-USB-Serial-PIO-Library.git"
+    },
+    "authors":
+    {
+        "name": "Florian Korotschenko",
+        "email": "Florian.Korotschenko1@web.de",
+        "url": "https://github.com/KingKoro",
+        "maintainer": true
+    },
+    "license": "MIT",
+    "frameworks": "noneos-sdk",
+    "platforms": "ch32v"
 }
