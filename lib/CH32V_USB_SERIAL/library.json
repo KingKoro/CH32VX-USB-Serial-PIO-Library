@@ -1,7 +1,7 @@
 {
     "name": "ch32v-usb-serial",
-    "version": "0.1.0",
-    "description": "A library for utilizing a USB Serial port (COM-Port) on CH32V/X MCUs.",
+    "version": "0.1.1",
+    "description": "A library for utilizing the USB Serial port (COM-Port) on CH32V/X MCUs.",
     "keywords": "ch32v, serial, usb, printf, scanf",
     "build": {
       "extraScript": "pio_set_ch32_platform.py"

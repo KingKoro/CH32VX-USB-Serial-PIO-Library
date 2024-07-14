@@ -56,6 +56,13 @@ extern uint8_t USBD_Endp3_Busy;
     uint16_t USB_Tx_async_num_tosend;                                                   /* Number of Bytes, waiting to be send */
     __attribute__ ((aligned(4))) uint8_t USB_Tx_async_buffer[USB_TX_ASYNC_BUFSIZE];     /* Hold TX Data (FIFO-Style) before sending */
     _Atomic int tx_semaphore = 0;                                                       /* This shared variable locks USB_Tx_runner() (TIM2) interrupt out from sending during write operation into async send buffer _putchar() */
+    void USB_Tx_runner();                                                               /* Declaration of asynchronous TX runner function */
+#endif
+
+#if (defined(CH32V10X) || defined(CH32V20X) || defined(CH32V30X)) && !defined(EXT_USB_TIM_HANDLER)
+    void TIM2_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
+#elif (defined(CH32X035) || defined(CH32X033)) && !defined(EXT_USB_TIM_HANDLER)
+    void TIM3_IRQHandler( void )__attribute__((interrupt("WCH-Interrupt-fast")));
 #endif
 
 /*********************************************************************
@@ -84,7 +91,7 @@ uint8_t RCC_Configuration( void )
     return 0;
 }
 
-#if defined(CH32V20X) || defined(CH32V10X) || defined(CH32V30X)
+#if (defined(CH32V20X) || defined(CH32V10X) || defined(CH32V30X)) && !defined(EXT_USB_TIM_HANDLER)
 /*********************************************************************
  * @fn      TIM2_Init
  *
@@ -118,7 +125,31 @@ void TIM2_Init( void )
     /* TIM2 enable counter */
     TIM_Cmd( TIM2, ENABLE );
 }
-#elif defined(CH32X035) || defined(CH32X033)
+
+/*********************************************************************
+ * @fn      TIM2_IRQHandler
+ *
+ * @brief   This function handles TIM2 exception.
+ *
+ * @return  none
+ */
+void TIM2_IRQHandler( void )
+{
+    /* uart timeout counts */
+    Uart.Rx_TimeOut++;
+    Uart.USB_Up_TimeOut++;
+    // If USB TX async mode: When USB Tx ready, send queued tx data via this ISR
+	#if(USB_TX_MODE == USB_TX_ASYNC)
+        if(!tx_semaphore)
+        {
+            USB_Tx_runner();
+        }
+	#endif
+    /* clear status */
+    TIM2->INTFR = (uint16_t)~TIM_IT_Update;
+}
+
+#elif (defined(CH32X035) || defined(CH32X033)) && !defined(EXT_USB_TIM_HANDLER)
 /*********************************************************************
  * @fn      TIM3_Init
  *
@@ -152,6 +183,33 @@ void TIM3_Init( void )
     /* TIM3 enable counter */
     TIM_Cmd( TIM3, ENABLE );
 }
+
+/*********************************************************************
+ * @fn      TIM3_IRQHandler
+ *
+ * @brief   This function handles TIM3 exception.
+ *
+ * @return  none
+ */
+void TIM3_IRQHandler( void )
+{
+    if( TIM_GetITStatus( TIM3, TIM_IT_Update ) != RESET )
+    {
+        /* Clear interrupt flag */
+        TIM_ClearITPendingBit( TIM3, TIM_IT_Update );
+        /* uart timeout counts */
+        Uart.Rx_TimeOut++;
+        Uart.USB_Up_TimeOut++;
+        // If USB TX async mode: When USB Tx ready, send queued tx data via this ISR
+        #if(USB_TX_MODE == USB_TX_ASYNC)
+            if(!tx_semaphore)
+            {
+                USB_Tx_runner();
+            }
+        #endif
+    }
+}
+
 #endif
 
 

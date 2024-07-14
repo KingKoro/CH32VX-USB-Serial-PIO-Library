@@ -90,6 +90,7 @@ extern "C" {
 #define TMP_FSTR_SIZE       16                  /* Length of individial strings of floats (num of floats stored at once = TMP_FBUF_SIZE / TMP_FSTR_SIZE) */
 #define TMP_FSTR_NUM        TMP_FBUF_SIZE / TMP_FSTR_SIZE   /* default is 8 slots for temporary float strings (automatically overwritten on overflow) */
 #define USB_SCANF_BUF_SIZE  512                 /* Maximum USB RX buffer size for scanf() before matching */
+//#define EXT_USB_TIM_HANDLER
 
 
 /* ++++++++++++++++++++ USER CONFIG AREA END ++++++++++++++++++++ */
