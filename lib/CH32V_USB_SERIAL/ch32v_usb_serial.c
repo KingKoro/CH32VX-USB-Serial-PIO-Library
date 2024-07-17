@@ -59,9 +59,9 @@ extern uint8_t USBD_Endp3_Busy;
     void USB_Tx_runner();                                                               /* Declaration of asynchronous TX runner function */
 #endif
 
-#if (defined(CH32V10X) || defined(CH32V20X) || defined(CH32V30X)) && !defined(EXT_USB_TIM_HANDLER)
+#if (defined(CH32V10X) || defined(CH32V20X) || defined(CH32V30X)) && !defined(EXT_USB_TIM_HANDLER) && (USB_TX_MODE == USB_TX_ASYNC)
     void TIM2_IRQHandler(void) __attribute__((interrupt("WCH-Interrupt-fast")));
-#elif (defined(CH32X035) || defined(CH32X033)) && !defined(EXT_USB_TIM_HANDLER)
+#elif (defined(CH32X035) || defined(CH32X033)) && !defined(EXT_USB_TIM_HANDLER) && (USB_TX_MODE == USB_TX_ASYNC)
     void TIM3_IRQHandler( void )__attribute__((interrupt("WCH-Interrupt-fast")));
 #endif
 
@@ -76,22 +76,23 @@ uint8_t RCC_Configuration( void )
 {
     RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA, ENABLE );
     RCC_APB1PeriphClockCmd( RCC_APB1Periph_USART2, ENABLE );
-
-    #if defined(CH32V10X)
-        RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM2, ENABLE );
-    #elif defined(CH32V20X)
-        RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM2, ENABLE );
-    #elif defined(CH32V30X)
-        RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM2, ENABLE );
-    #elif defined(CH32X035) || defined(CH32X033)
-        RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM3, ENABLE );
+    #if(USB_TX_MODE == USB_TX_ASYNC)
+        #if defined(CH32V10X)
+            RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM2, ENABLE );
+        #elif defined(CH32V20X)
+            RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM2, ENABLE );
+        #elif defined(CH32V30X)
+            RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM2, ENABLE );
+        #elif defined(CH32X035) || defined(CH32X033)
+            RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM3, ENABLE );
+        #endif
     #endif
     
     RCC_AHBPeriphClockCmd( RCC_AHBPeriph_DMA1, ENABLE );
     return 0;
 }
 
-#if (defined(CH32V20X) || defined(CH32V10X) || defined(CH32V30X)) && !defined(EXT_USB_TIM_HANDLER)
+#if (defined(CH32V20X) || defined(CH32V10X) || defined(CH32V30X)) && !defined(EXT_USB_TIM_HANDLER) && (USB_TX_MODE == USB_TX_ASYNC)
 /*********************************************************************
  * @fn      TIM2_Init
  *
@@ -149,7 +150,7 @@ void TIM2_IRQHandler( void )
     TIM2->INTFR = (uint16_t)~TIM_IT_Update;
 }
 
-#elif (defined(CH32X035) || defined(CH32X033)) && !defined(EXT_USB_TIM_HANDLER)
+#elif (defined(CH32X035) || defined(CH32X033)) && !defined(EXT_USB_TIM_HANDLER) && (USB_TX_MODE == USB_TX_ASYNC)
 /*********************************************************************
  * @fn      TIM3_Init
  *
@@ -307,13 +308,13 @@ void USB_Serial_initialize()
 {
     RCC_Configuration( );
 
-    #if defined(CH32V10X)
+    #if defined(CH32V10X) && (USB_TX_MODE == USB_TX_ASYNC)
         TIM2_Init( );
-    #elif defined(CH32V20X)
+    #elif defined(CH32V20X) && (USB_TX_MODE == USB_TX_ASYNC)
         TIM2_Init( );
-    #elif defined(CH32V30X)
+    #elif defined(CH32V30X) && (USB_TX_MODE == USB_TX_ASYNC)
         TIM2_Init( );
-    #elif defined(CH32X035) || defined(CH32X033)
+    #elif (defined(CH32X035) || defined(CH32X033)) && (USB_TX_MODE == USB_TX_ASYNC)
         TIM3_Init( );
     #endif
     
@@ -794,7 +795,7 @@ void _USB_Serial_print_buffer(char buffer[], uint16_t length, uint16_t start_ind
         // Update number of bytes to send
         USB_Tx_async_num_tosend += length;
     #else
-        uint8_t success = USB_ERROR;
+        uint8_t success = 0;
         uint8_t * uint_buffer = (uint8_t*)buffer + start_index;
 
         if(length > 0)
