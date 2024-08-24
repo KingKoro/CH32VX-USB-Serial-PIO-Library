@@ -1,0 +1,16 @@
+{
+    "name": "ch32v-ftoa-atof",
+    "version": "0.1.0",
+    "description": "A library for converting floats to/from strings on CH32V/X MCUs.",
+    "keywords": "ch32v, ftoa, atof, printf, scanf",
+    "authors":
+    {
+        "name": "Florian Korotschenko",
+        "email": "Florian.Korotschenko1@web.de",
+        "url": "https://github.com/KingKoro",
+        "maintainer": true
+    },
+    "license": "MIT",
+    "frameworks": "noneos-sdk",
+    "platforms": "ch32v"
+}

@@ -39,6 +39,7 @@
 #endif
 
 #include "ch32v_usb_serial.h"
+#include "ch32v_ftoa_atof.h"
 
 #define TRUE 1
 #define FALSE 0

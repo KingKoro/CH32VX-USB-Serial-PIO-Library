@@ -2,7 +2,8 @@
 This repository contains a CH32Vx/CH32X0x PIO NoneOS library for serial communication over usb ports. It is supposed to work with CH32V10X, CH32V20X, CH32V30X, CH32X033 and CH32X035 MCUs and is based on the SimulateCDC drivers, provided in the [OpenWCH](https://github.com/openwch) examples.
 
 # Warning
-Currently this library does not yet work on CH32V30X MCUs.
+- Currently this library does not yet work on CH32V30X MCUs.
+- Due to issues with stdlib's ftoa and atof functions, this repository comes with an additional library ``CH32V_FTOA_ATOF`` to implement these conversions correctly.
 
 # Installation
 ## Prequisites
@@ -11,9 +12,13 @@ You need to have PlatformIO VSCode Plugin with the [WCH CH32V](https://github.co
 ## Setup
 Simply clone this repository onto your computer and open the folder like a regular PlatformIO project. You can set the build target by choosing one from the ```platformio.ini``` file or adding your own one for the specific MCU model. Just take the predefined environments as an example.
 
-Alternativly, you can also copy the library ```lib/CH32V_USB_SERIAL``` into any PIO project, modify your ```platformio.ini```, add the required ```ch32xxxx_it``` code for the timer interrupt handlers (recommended for async tx mode) and import the library into your ```main.c``` with: 
+Alternativly, you can also copy the library ```lib/CH32V_USB_SERIAL``` into any PIO project, modify your ```platformio.ini```, ~~add the required ```ch32xxxx_it``` code for the timer interrupt handlers (recommended for async tx mode)~~ (optional if you must provide your own external USB asynchronous TX Timer IRQHandler) and import the library into your ```main.c``` with:
 ```c
 #include "ch32v_usb_serial.h"
+```
+If needed, also copy over ``lib/CH32V_FTOA_ATOF`` into you PIO project and import it with
+```c
+#include "ch32v_ftoa_atof.h"
 ```
 
 # Usage
@@ -31,12 +36,16 @@ Afterwards, edit the user config section (line 82 to 92) in ```lib/CH32V_USB_SER
 | USB_TX_MODE | Select USB TX send mode (either ```USB_TX_SYNC``` for synchronous or ```USB_TX_ASYNC```for asynchronous). In synchronous mode, printf() will wait for usb availability and return after data was sent. In asynchronous mode, printf() returns immediately, and only writes into a send buffer, which needs to be periodically read from and actually written into the usb port. This can be achieved by either calling ```USB_Tx_runner()``` in an endless while-loop or using a timer interrupt routine to call ```USB_Tx_runner()``` periodically (default). Timer 2 is used for this purpose, except for CH32X03x, which uses Timer 3. These Timer handlers are declared and utilized within this library already, therefore, to avoid confusion and compatibility issues, it is advised to not use these Timers for anything else. If you wish to supply your own handler for Timer 2 or Timer 3 anyways, remove the comment on line 93 ```#define EXT_USB_TIM_HANDLER``` in ``ch32v_usb_serial.h`` and define the IRQHandler externally. Make sure to include the same code, invoking ``USB_Tx_runner()``, in the IRQHandler's body. See ``ch32v_usb_serial.c`` for reference.      |
 | USB_RX_OVERFLOW           | Select USB Port receive overflow mode. Select either ```USB_RX_HALT``` (default) to stop accepting USB traffic if the receive buffer is almost full and not being processed fast enough, or ```USB_RX_OVERWRITE``` to ignore overflow and overwrite older data.    |
 | GETCH_CLI_FEEDBACK         | Wether to display feedback into console when typing into. Comment out if not desired. Default = on                |
-| TMP_FBUF_SIZE         | Buffer size to temporary store float strings after conversion in ftoa_s(). Default = 128 Bytes |
-| TMP_FSTR_SIZE         | Length of individial strings of floats (num of floats stored at once = TMP_FBUF_SIZE / TMP_FSTR_SIZE). Default = 16 Bytes |
-| TMP_FSTR_NUM          | TMP_FBUF_SIZE / TMP_FSTR_SIZE   default is 8 slots for temporary float strings (automatically overwritten on overflow) |
 | USB_SCANF_BUF_SIZE    | Maximum USB RX buffer size for scanf() before matching. Default = 512 Bytes |
 | EXT_USB_TIM_HANDLER   | Remove comment to supply the USB asynchronous TX Timer IRQHandler yourself. Useful if you need that timer to do something else as well. Default = Commented out |
 
+For the ``CH32V_FTOA_ATOF`` library, configuration can be done in the same way (line 41 to 43 in ```lib/CH32V_FTOA_ATOF/ch32v_ftoa_atof.h```) with the following settings:
+
+|       Option:       | Description:                                                           |
+|:-----------------:|-----------------------------------------------------------------|
+| TMP_FBUF_SIZE           |   HBuffer size to temporary store float strings after conversion in ftoa_s(). Default = 128   |
+| TMP_FSTR_SIZE         |     Length of individial strings of floats (num of floats stored at once = TMP_FBUF_SIZE / TMP_FSTR_SIZE). Default = 16      |
+| TMP_FSTR_NUM       | default is 8 slots for temporary float strings (automatically overwritten on overflow). Default = TMP_FBUF_SIZE / TMP_FSTR_SIZE |
 
 Now you can compile and upload the project.
 
@@ -53,6 +62,8 @@ int getch()                     /* getchar() */
 
 uint16_t USB_Serial_printf(char *format, ...)   /* printf() */
 int USB_Serial_scanf(uint8_t block, char *format, ...)  /* scanf() */
+
+// CH32V_FTOA_ATOF Library specific:
 
 char * ftoa_s(double val, int precision)    /* compact ftoa() */
 double ratof(char *arr)     /* atof() double */

@@ -39,7 +39,6 @@ extern "C" {
 #include "debug.h"
 #include "stdlib.h"
 #include "stdatomic.h"
-#include "ftoa.h"
 #include "stdarg.h"  // For handling variadic arguments
 
 
@@ -86,9 +85,6 @@ extern "C" {
 #define USB_TX_MODE         USB_TX_ASYNC        /* Select USB Port Send Mode here */
 #define USB_RX_OVERFLOW     USB_RX_HALT         /* Select USB Port Receive Overflow Mode here */   
 #define GETCH_CLI_FEEDBACK                      /* Wether to display feedback into console when typing in */
-#define TMP_FBUF_SIZE       128                 /* Buffer size to temporary store float strings after conversion in ftoa_s() */
-#define TMP_FSTR_SIZE       16                  /* Length of individial strings of floats (num of floats stored at once = TMP_FBUF_SIZE / TMP_FSTR_SIZE) */
-#define TMP_FSTR_NUM        TMP_FBUF_SIZE / TMP_FSTR_SIZE   /* default is 8 slots for temporary float strings (automatically overwritten on overflow) */
 #define USB_SCANF_BUF_SIZE  512                 /* Maximum USB RX buffer size for scanf() before matching */
 //#define EXT_USB_TIM_HANDLER
 
@@ -285,12 +281,9 @@ extern int getch();
 #endif
 extern void _USB_Serial_print_buffer(char buffer[], uint16_t length, uint16_t start_index);
 extern uint16_t USB_Serial_printf(char *format, ...);
-extern char * ftoa_s(double val, int precision);
 extern uint16_t USB_Rx_readpacket(int16_t index, char * buf, uint8_t sanitize);
 extern uint16_t USB_Rx_readfull(char * buf, uint16_t max_n, uint8_t sanitize);
 extern int USB_Serial_scanf(uint8_t block, char *format, ...);
-extern double ratof(char *arr);
-extern float ratoff(char *arr);
 
 
 #ifdef __cplusplus
